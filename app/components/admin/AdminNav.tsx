@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import AdminNavItem from "./AdminNavItem";
-import { MdDashboard, MdDns, MdFormatListBulleted, MdLibraryAdd } from "react-icons/md";
+import { MdDashboard, MdDns, MdFormatListBulleted, MdLibraryAdd, MdAccountCircle, MdPercent } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import Container from "../Container";
 
@@ -27,6 +27,20 @@ const AdminNav = () => {
                         label="Summary" 
                         icon={MdDashboard} 
                         selected={pathname === '/admin'}
+                        />
+                    </Link>
+                    <Link href='/admin/add-users'>
+                        <AdminNavItem 
+                        label="Add Users" 
+                        icon={MdAccountCircle} 
+                        selected={pathname === '/admin/add-users'}
+                        />
+                    </Link>
+                    <Link href='/admin/add-prom'>
+                        <AdminNavItem 
+                        label="Add Prom" 
+                        icon={MdPercent} 
+                        selected={pathname === '/admin/add-prom'}
                         />
                     </Link>
                     <Link href='/admin/add-products'>

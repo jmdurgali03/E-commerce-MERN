@@ -50,7 +50,7 @@ const CheckoutClient = () => {
         .catch((error) => {
           setError(true);
           console.log("Error", error);
-          toast.error("Somehting went wrong");
+          toast.error("Something went wrong");
         });
     }
   }, [cartProducts, paymentIntent]);

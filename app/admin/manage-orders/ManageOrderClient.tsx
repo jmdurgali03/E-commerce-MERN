@@ -53,7 +53,7 @@ const ManageOrdersClient: React.FC<ManageOrdersClientProps> = ({ orders }) => {
       width: 130,
       renderCell: (params) => {
         return (
-          <div className="font-semibold text-slate-800">{params.row.price}</div>
+          <div className="font-semibold text-slate-800">{params.row.amount}</div>
         );
       },
     },

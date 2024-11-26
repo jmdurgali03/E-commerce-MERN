@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 
-export const products = [
+export const listProducts = [
     {
       id: "1",
       name: "Onyx Studio 8",

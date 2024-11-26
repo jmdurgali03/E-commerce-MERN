@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
 import Link from "next/link";
 import { MdArrowBack } from "react-icons/md";
@@ -10,13 +11,35 @@ import { formatPrice } from "@/utils/formatPrice";
 import { SafeUser } from "@/types";
 import { useRouter } from "next/navigation";
 
-interface CartClientProps{
-    currentUser: SafeUser | null
+interface CartClientProps {
+    currentUser: SafeUser | null;
 }
 
-const CartClient: React.FC<CartClientProps> = ({currentUser}) => {
+const CartClient: React.FC<CartClientProps> = ({ currentUser }) => {
     const { cartProducts, handleClearCart, cartTotalAmount } = useCart();
     const router = useRouter();
+
+    const [promoCode, setPromoCode] = useState<string>("");
+    const [discount, setDiscount] = useState<number>(0);
+    const [finalTotal, setFinalTotal] = useState<number>(cartTotalAmount);
+
+    useEffect(() => {
+        const discountedTotal = cartTotalAmount - (cartTotalAmount * discount) / 100;
+        setFinalTotal(discountedTotal);
+    }, [cartTotalAmount, discount]);
+
+    const applyPromoCode = () => {
+        const promotions = JSON.parse(localStorage.getItem("promotions") || "[]");
+        const validPromo = promotions.find((promo: any) => promo.code === promoCode);
+
+        if (validPromo) {
+            setDiscount(validPromo.discount);
+            alert(`Promo code applied! ${validPromo.discount}% off.`);
+        } else {
+            setDiscount(0);
+            alert("Invalid promo code.");
+        }
+    };
 
     if (!cartProducts || cartProducts.length === 0) {
         return (
@@ -27,74 +50,66 @@ const CartClient: React.FC<CartClientProps> = ({currentUser}) => {
                         text-blue-600
                         flex
                         items-center
-                        gap-1
-                        mt-2
-                        hover:text-blue-800
-                        transition
+                        mt-4
                     ">
-                        <MdArrowBack />
-                        <span>Start Shopping</span>
+                        <MdArrowBack size={20} />
+                        Continue Shopping
                     </Link>
                 </div>
             </div>
-        )
+        );
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-16 px-4">
-            <Heading tittle="Shopping Cart" center />
-            <div className="
-                grid
-                grid-cols-5
-                text-sm
-                gap-4
-                pb-4
-                items-center
-                mt-8
-                border-b
-                border-gray-200
-            ">
-                <div className="col-span-2 justify-self-start font-semibold text-gray-800">PRODUCT</div>
-                <div className="justify-self-start font-semibold text-gray-800">PRICE</div>
-                <div className="justify-self-start font-semibold text-gray-800">QUANTITY</div>
-                <div className="justify-self-end font-semibold text-gray-800">TOTAL</div>
+        <div className="max-w-3xl mx-auto py-8 px-4">
+            <Heading tittle="Your Cart" />
+            <div className="space-y-4">
+                {cartProducts.map((product, index) => (
+                    <ItemContent key={index} item={product} />
+                ))}
             </div>
-            <div>
-                {cartProducts && cartProducts.map((item) => {
-                    return <ItemContent key={item.id} item={item} />;
-                })}
+
+            <div className="mt-6">
+                <h2 className="text-lg font-semibold">Cart Summary</h2>
+                <div className="flex justify-between items-center py-2">
+                    <span>Subtotal:</span>
+                    <span>{formatPrice(cartTotalAmount)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                    <span>Discount:</span>
+                    <span>{discount}%</span>
+                </div>
+                <div className="flex justify-between items-center py-2 font-bold">
+                    <span>Total:</span>
+                    <span>{formatPrice(finalTotal)}</span>
+                </div>
             </div>
-            <div className="border-t border-gray-200 py-4 flex justify-between items-center">
-                <div className="w-[90px]">
-                    <Button label="Clear Cart" onClick={() => { handleClearCart() }} small outline />
-                </div>
-                <div className="text-sm flex flex-col gap-1 items-end">
-                    <div className="flex justify-between w-full text-base font-semibold">
-                        <span>Subtotal</span>
-                        <span>{formatPrice(cartTotalAmount)}</span>
-                    </div>
-                    <p className="text-gray-500">Taxes and shipping calculated at checkout</p>
-                    <Button 
-                      label={currentUser ? 'Checkout' : 'Login to Checkout'}
-                      outline={currentUser ? false : true}
-                      onClick={() => {currentUser ? router.push('/checkout') : router.push('/login')}} 
-                    />
-                    <Link href={"/"} className="
-                        text-blue-600
-                        flex
-                        items-center
-                        gap-1
-                        mt-2
-                        hover:text-blue-800
-                        transition
-                    ">
-                        <MdArrowBack />
-                        <span>Continue Shopping</span>
-                    </Link>
-                </div>
+
+            <div className="mt-4 flex flex-col gap-4">
+                <input
+                    type="text"
+                    placeholder="Enter promo code"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    className="p-2 border border-gray-300 rounded-md w-full"
+                />
+                <Button
+                    label="Apply Promo Code"
+                    onClick={applyPromoCode}
+                    disabled={!promoCode}
+                />
+                <Button
+                    label="Proceed to Checkout"
+                    onClick={() => router.push("/checkout")}
+                />
+                <Button
+                    label="Clear Cart"
+                    onClick={handleClearCart}
+                    outline
+                />
             </div>
         </div>
     );
-}
+};
 
 export default CartClient;

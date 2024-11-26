@@ -5,6 +5,9 @@ import HomeBanner from "./components/HomeBanner";
 import ProductCar from "./components/products/ProductCart";
 import getProducts, { IProductParams } from "@/actions/getProducts";
 import NullData from "./components/NullData";
+import {listProducts} from "@/utils/listProducts";
+import { CarouselSize } from "@/utils/carousel";
+
 
 interface HomeProps {
   searchParams: IProductParams;
